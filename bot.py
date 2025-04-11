@@ -42,13 +42,11 @@ else:
 @client.event
 async def on_ready():
     logging.info(f'We have logged in as {client.user}')
-    status_message = "🧀 Powered by Gouda 🧀"
-    if mistral_client:
-        status_message = "🧀 Powered by Gouda & Mistral 🧀"
+    status_message = "with the finest 🧀 curds" # Base status
 
     await client.change_presence(
         status=discord.Status.online,
-        activity=discord.Activity(type=discord.ActivityType.custom, name=status_message)
+        activity=discord.Activity(type=discord.ActivityType.playing, name=status_message)
     )
     logging.info('Bot is ready and listening!')
 
@@ -66,7 +64,7 @@ async def on_message(message):
     # Check if Mistral client is available
     if not mistral_client:
         logging.warning("Mistral AI not configured. Cannot process message.")
-        # await message.channel.send("My Mistral AI brain is offline right now.")
+        await message.channel.send("I'm sorry, but I can't process messages without Mistral AI configured.")
         return
 
     user_input = message.content.replace(f'<@!{client.user.id}>', '').strip()
@@ -99,14 +97,14 @@ async def on_message(message):
                 await message.channel.send(response_text)
             else:
                 logging.warning("Mistral AI returned an empty response.")
-                await message.channel.send("I received an empty response from my AI brain.")
+                await message.channel.send("I received an empty response from my Mistral AI brain.")
 
         except discord.errors.Forbidden:
             logging.warning(f"Missing permissions to send message in channel {message.channel.id}")
         except Exception as e:
             logging.exception(f"Error processing message with Mistral AI: {e}")
             try:
-                await message.channel.send("An error occurred while trying to get an AI response.")
+                await message.channel.send("An error occurred while trying to get an AI response from Mistral.")
             except discord.errors.Forbidden:
                 logging.warning(f"Missing permissions to send error message in channel {message.channel.id}")
 
