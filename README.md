@@ -4,13 +4,13 @@ A Discord bot integrating Google AI services (using ADK principles).
 
 ## Project Overview
 
-This bot is designed to interact with users on Discord, leveraging Google Cloud's AI capabilities (like Dialogflow CX or Vertex AI) for natural language understanding and conversation management.
+This bot is designed to interact with users on Discord, leveraging Google Cloud's AI capabilities. It aims to follow the principles and potentially utilize the [Google Agent Development Kit (ADK)](https://google.github.io/adk-docs/), a framework for building modular and deployable AI agents integrated with Google's ecosystem (like Gemini models and Vertex AI).
 
 ## Tech Stack
 
-*   **Backend:** Python 3.x
+*   **Backend:** Python 3.12
 *   **Discord API:** `discord.py`
-*   **Agent/NLU:** Google Cloud AI Services (via `google-cloud-aiplatform`, etc.)
+*   **Agent/NLU:** Google Cloud AI Services & Google ADK (via `google-cloud-aiplatform`, `google-adk`, etc.)
 *   **Package Management:** `uv` with `pyproject.toml`
 *   **Environment:** VS Code Dev Container (Ubuntu)
 *   **Configuration:** `python-dotenv` (`.env` file)
@@ -47,4 +47,4 @@ This bot is designed to interact with users on Discord, leveraging Google Cloud'
 
 ## License
 
-(Specify your chosen license - default in pyproject.toml is MIT)
+[MIT License](https://choosealicense.com/licenses/mit/)

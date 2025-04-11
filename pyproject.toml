@@ -17,6 +17,7 @@ dependencies = [
     "discord.py",
     "python-dotenv",
     "google-cloud-aiplatform",
+    "google-adk", # Google Agent Development Kit
     # Add other Google Cloud libraries as needed
 ]
 
