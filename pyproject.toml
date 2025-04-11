@@ -16,8 +16,7 @@ classifiers = [
 dependencies = [
     "discord.py",
     "python-dotenv",
-    "google-cloud-aiplatform",
-    "google-adk", # Google Agent Development Kit
+    "mistralai>=0.1.0", # Mistral AI API client
     # Add other Google Cloud libraries as needed
 ]
 
