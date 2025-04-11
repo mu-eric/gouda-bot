@@ -22,7 +22,10 @@ client = discord.Client(intents=intents)
 @client.event
 async def on_ready():
     print(f'We have logged in as {client.user}')
-    await client.change_presence(status=discord.Status.online, activity=discord.Game("Xel'Naga")) # Set status and activity
+    await client.change_presence(
+        status=discord.Status.online,
+        activity=discord.Activity(type=discord.ActivityType.custom, name="🧀 Powered by Gouda 🧀")
+    )
     print('Bot is ready and listening!')
 
 @client.event
