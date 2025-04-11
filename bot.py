@@ -42,7 +42,7 @@ else:
 @client.event
 async def on_ready():
     logging.info(f'We have logged in as {client.user}')
-    status_message = "with the finest 🧀 curds" # Base status
+    status_message = "with the finest curds" # Base status
 
     await client.change_presence(
         status=discord.Status.online,
