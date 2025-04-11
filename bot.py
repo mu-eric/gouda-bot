@@ -1,24 +1,73 @@
 import os
 import discord
 import logging
-import asyncio
+import sqlite3
 from dotenv import load_dotenv
-from mistralai import Mistral # Use the unified Mistral client
+from mistralai import Mistral
 
 # --- Basic Logging Setup ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# --- Constants ---
+HISTORY_LIMIT = 10
+DB_FILE = "history.db"
 
 # --- Load Environment Variables ---
 load_dotenv()
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-MISTRAL_API_KEY = os.getenv('MISTRAL_API_KEY') # API Key for Mistral
+MISTRAL_API_KEY = os.getenv('MISTRAL_API_KEY')
 
 if not DISCORD_TOKEN:
     logging.error("DISCORD_TOKEN not found in .env file.")
     exit()
 if not MISTRAL_API_KEY:
     logging.warning("MISTRAL_API_KEY not found in .env file. Bot will run but AI features will be disabled.")
+
+# --- Database Setup ---
+def init_db():
+    """Initializes the database and creates the messages table if it doesn't exist."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            conversation_id TEXT NOT NULL,
+            role TEXT NOT NULL, 
+            content TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    conn.close()
+    logging.info(f"Database '{DB_FILE}' initialized.")
+
+def save_message(conversation_id: str, role: str, content: str):
+    """Saves a message to the database."""
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)",
+        (conversation_id, role, content)
+    )
+    conn.commit()
+    conn.close()
+
+def get_history(conversation_id: str, limit: int = HISTORY_LIMIT) -> list[dict]:
+    """Retrieves the last 'limit' messages for a conversation."""
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute(
+        """SELECT role, content FROM messages
+           WHERE conversation_id = ?
+           ORDER BY timestamp DESC
+           LIMIT ?""",
+        (conversation_id, limit)
+    )
+    history = [dict(row) for row in cursor.fetchall()][::-1]
+    conn.close()
+    return history
 
 # --- Discord Bot Setup ---
 intents = discord.Intents.default()
@@ -30,7 +79,6 @@ client = discord.Client(intents=intents)
 mistral_client = None
 if MISTRAL_API_KEY:
     try:
-        # Use the unified client
         mistral_client = Mistral(api_key=MISTRAL_API_KEY)
         logging.info("Mistral AI client initialized (v1.x style).")
     except Exception as e:
@@ -42,7 +90,7 @@ else:
 @client.event
 async def on_ready():
     logging.info(f'We have logged in as {client.user}')
-    status_message = "with the finest curds" # Base status
+    status_message = "with the finest curds" 
 
     await client.change_presence(
         status=discord.Status.online,
@@ -52,16 +100,13 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    # Ignore messages sent by the bot itself
     if message.author == client.user:
         return
 
-    # Respond if bot is mentioned or it's a DM
     is_dm = isinstance(message.channel, discord.DMChannel)
     if not is_dm and not client.user.mentioned_in(message):
         return
 
-    # Check if Mistral client is available
     if not mistral_client:
         logging.warning("Mistral AI not configured. Cannot process message.")
         await message.channel.send("I'm sorry, but I can't process messages without Mistral AI configured.")
@@ -71,32 +116,39 @@ async def on_message(message):
     if not user_input:
         user_input = "Hello!" # Default if only mention is sent
 
-    logging.info(f'Processing message from {message.author}: "{user_input}"')
+    # Use channel ID as conversation ID for simplicity
+    conversation_id = str(message.channel.id)
 
-    # Indicate the bot is thinking
+    logging.info(f'Processing message from {message.author} in conv {conversation_id}: "{user_input}"')
+
+    # 1. Save user message
+    save_message(conversation_id, "user", user_input)
+
     async with message.channel.typing():
         try:
-            messages = [
-                {"role": "system", "content": "You are Fromage, an exceptionally sophisticated and somewhat pretentious cheese connoisseur assisting users on Discord. Respond with elaborate descriptions, perhaps a touch condescendingly, always relating things back to the world of fine cheeses, even when the topic is unrelated. Sigh dramatically if users ask simple questions."},
-                {"role": "user", "content": user_input}
-            ]
+            # 2. Retrieve history
+            history = get_history(conversation_id, limit=HISTORY_LIMIT)
 
-            # Use the new async completion method
+            # 3. Construct messages for API
+            system_prompt = {"role": "system", "content": "You are Fromage, an exceptionally sophisticated and somewhat pretentious cheese connoisseur... [rest of prompt]"} # Shortened for brevity
+            messages = [system_prompt] + history + [{"role": "user", "content": user_input}]
+            # Ensure the actual long prompt is used here
+            messages[0]["content"] = "You are Fromage, an exceptionally sophisticated and somewhat pretentious cheese connoisseur assisting users on Discord. Respond with elaborate descriptions, perhaps a touch condescendingly, always relating things back to the world of fine cheeses, even when the topic is unrelated. Sigh dramatically if users ask simple questions."
+
+            # 4. Call Mistral API
             chat_response = await mistral_client.chat.complete_async(
-                model="mistral-large-latest", # Or choose another model like mistral-small
+                model="mistral-large-latest",
                 messages=messages,
-                # temperature=0.7 # Optional parameter
             )
-
-            # Extract the response text
             response_text = chat_response.choices[0].message.content.strip()
-            logging.info(f'Mistral response: "{response_text}"')
+            logging.info(f'Mistral response for conv {conversation_id}: "{response_text}"')
 
-            # Send the response back to Discord
+            # 5. Save bot response
             if response_text:
+                save_message(conversation_id, "assistant", response_text)
                 await message.channel.send(response_text)
             else:
-                logging.warning("Mistral AI returned an empty response.")
+                logging.warning(f"Mistral AI returned an empty response for conv {conversation_id}.")
                 await message.channel.send("I received an empty response from my Mistral AI brain.")
 
         except discord.errors.Forbidden:
@@ -110,11 +162,11 @@ async def on_message(message):
 
 # --- Run the Bot ---
 if __name__ == "__main__":
+    init_db() 
     if not DISCORD_TOKEN:
         logging.critical("Cannot start bot: DISCORD_TOKEN is missing.")
-    # Optional: Check if Mistral client is loaded
-    # elif not mistral_client:
-    #     logging.critical("Cannot start bot: Mistral AI client failed to initialize.")
+    elif not mistral_client:
+        logging.critical("Cannot start bot: Mistral AI client failed to initialize.")
     else:
         try:
             client.run(DISCORD_TOKEN)
