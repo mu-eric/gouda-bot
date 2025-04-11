@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gouda-bot"
+version = "0.1.0"
+description = "A Discord bot integrating Google AI services."
+readme = "README.md" # Optional: Add a README later
+requires-python = ">=3.8" # Specify a minimum Python version
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License", # Choose your license
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "discord.py",
+    "python-dotenv",
+    "google-cloud-aiplatform",
+    # Add other Google Cloud libraries as needed
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff", # Add Ruff for linting/formatting
+]
+
+# Optional: Configure tools like pytest, ruff, mypy etc. here
+# [tool.pytest.ini_options]
+# pythonpath = ["."]
+
+# [tool.ruff]
+# line-length = 88
+# select = ["E", "F", "W", "I"] # Example rule selection

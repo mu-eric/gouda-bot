@@ -1,0 +1,30 @@
+{
+	"name": "Python 3 (Ubuntu)",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/python:latest",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// Install uv first, then use it to install dependencies from pyproject.toml into the system environment
+	// Also add an alias for pip -> uv pip to .bashrc for convenience
+	"postCreateCommand": "pip install uv && uv pip install --system -e '.[dev]' && echo 'alias pip=\"uv pip\"' >> ~/.bashrc",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.debugpy",
+				"ms-azuretools.vscode-docker"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

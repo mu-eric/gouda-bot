@@ -1,0 +1,32 @@
+# Gouda Bot - Windsurf Rules
+
+## Project Context:
+- **Project Name:** Gouda Bot
+- **Goal:** Create a Discord bot using Python, integrating Google AI services (like Dialogflow CX or Vertex AI) based on Google ADK principles.
+- **Development Environment:** VS Code Dev Container (Ubuntu base image).
+
+## Tech Stack & Tooling:
+- **Language:** Python (>=3.12)
+- **Discord Library:** discord.py
+- **Google Cloud:** google-cloud-aiplatform (and potentially others like google-cloud-dialogflow-cx)
+- **Package Management:** `uv` with `pyproject.toml`. No virtual environment inside the container (use `uv pip install --system`).
+- **Configuration:** `python-dotenv` (using `.env` file for secrets like `DISCORD_TOKEN`).
+- **Main Script:** `bot.py`
+- **Testing:** `pytest` (defined in `[project.optional-dependencies.dev]` in `pyproject.toml`).
+
+## Development Guidelines & Best Practices:
+- **Code Style:** Follow PEP 8 guidelines. Consider using a linter like Ruff and a formatter like Black (can be configured in `pyproject.toml`).
+- **Secrets:** Keep all secrets (API keys, tokens) in the `.env` file. Ensure `.env` is in `.gitignore`.
+- **Error Handling:** Implement robust error handling, especially around API calls (Discord, Google Cloud). Use try-except blocks appropriately.
+- **Logging:** Use Python's `logging` module for informative logs instead of just `print()` statements for easier debugging.
+- **Asynchronous Code:** Use `async` and `await` correctly, especially given `discord.py` is an async library. Be mindful of blocking operations.
+- **Modularity:** Break down bot logic into smaller, reusable functions or cogs (discord.py extensions) as complexity increases.
+- **Testing:** Write unit tests using `pytest` for core logic and utility functions. Place tests in a `tests/` directory.
+- **Documentation:** Add docstrings to functions and classes. Keep the `README.md` updated.
+- **Dependencies:** Keep `pyproject.toml` up-to-date. Add comments explaining non-obvious dependencies.
+- **Credentials:** For Google Cloud, prefer service account keys mounted securely into the container or workload identity federation if possible, rather than hardcoding paths directly in code (use environment variables loaded from `.env`).
+
+## AI Assistant Specifics:
+- When adding new dependencies, update `pyproject.toml` and inform the user to rebuild the container or run `uv pip install --system -e '.[dev]'` inside the container.
+- When referencing files, use relative paths from the project root (`/workspaces/gouda-bot/` inside the container) where appropriate, or the full host path (`c:\Dev\gouda-bot\...`) if needed for clarity with the user.
+- Prioritize using `uv` for package operations as requested.
