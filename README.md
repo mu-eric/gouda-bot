@@ -43,7 +43,7 @@ This bot, operating under the persona "Fromage," is designed to interact with us
 
 ## Contributing
 
-(Add contribution guidelines later if applicable)
+(Will add contribution guidelines later if applicable)
 
 ## License
 
