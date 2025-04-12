@@ -23,6 +23,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest",
+    "pytest-cov",
+    "pytest-mock",
     "ruff", # Add Ruff for linting/formatting
 ]
 
