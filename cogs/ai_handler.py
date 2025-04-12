@@ -95,9 +95,11 @@ class AIHandler(commands.Cog):
         history = database.get_history(conversation_id, limit=config.HISTORY_LIMIT)
         formatted_history = self.format_history_for_api(history)
 
-        # Add the system prompt as the first message
-        # Use the prompt stored on the bot instance (set in main bot.py)
-        system_message = {"role": "system", "content": self.bot.current_system_prompt}
+        # Determine the system prompt to use for this channel
+        custom_prompt = database.get_channel_prompt(conversation_id)
+        system_prompt_content = custom_prompt if custom_prompt else config.DEFAULT_SYSTEM_PROMPT
+        system_message = {"role": "system", "content": system_prompt_content}
+
         api_messages = [system_message] + formatted_history
 
         # Call Mistral AI API
@@ -128,6 +130,4 @@ class AIHandler(commands.Cog):
 
 # This setup function is required for the cog to be loaded by the bot
 async def setup(bot: commands.Bot):
-    # Pass the bot instance to the Cog
     await bot.add_cog(AIHandler(bot))
-    logging.info("AIHandler Cog loaded.")

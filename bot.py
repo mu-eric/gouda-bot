@@ -29,10 +29,6 @@ intents.guilds = True # Needed for guild-only commands and context
 # Initialize the bot
 bot = commands.Bot(command_prefix="$", intents=intents)
 
-# Store the system prompt on the bot instance for Cogs to access
-# Initialize with the default from config
-bot.current_system_prompt = config.DEFAULT_SYSTEM_PROMPT
-
 # --- Cog Loading ---
 async def load_extensions():
     """Loads all cogs from the 'cogs' directory."""
