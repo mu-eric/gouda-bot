@@ -10,6 +10,8 @@ This bot leverages the `discord.py` library (using the `commands.Bot` framework 
 *   **Empathetic Personality:** System prompt designed to foster warmth, understanding, and genuine curiosity.
 *   **Conversation History:** Remembers the last few messages in a channel to maintain context (using SQLite).
 *   **Configurable System Prompt:** Bot owner can change the core personality prompt using the `$setprompt` command.
+*   **Per-Channel Prompts:** Set custom system prompts for individual channels using `$setprompt`. These prompts are saved in the database and persist across bot restarts.
+*   **Prompt Reset:** Reset a channel's prompt back to the default using `$resetprompt` (requires 'Manage Messages' permission).
 *   **History Clearing:** Users with 'Manage Messages' permission (or the bot owner via `$setprompt`) can clear the bot's memory for a specific channel using `$clearhistory`.
 *   **Modular Structure:** Core logic is organized into Cogs (`cogs/ai_handler.py`, `cogs/admin_commands.py`) for better maintainability.
 *   **Configuration Module:** Settings and environment variable loading handled in `config.py`.
@@ -42,8 +44,16 @@ This bot leverages the `discord.py` library (using the `commands.Bot` framework 
 6.  **Run the bot:** Once dependencies are installed, run the bot from the integrated terminal:
     ```bash
     python bot.py
+    python -m bot
     ```
 7.  **Interact:** Talk to the bot via Direct Message or by mentioning it in a channel (`@Fromage`, which might still be Fromage Bot unless changed in the Discord Developer Portal).
+
+## Commands
+
+*   `$setprompt <prompt_text>`: Sets a custom system prompt specifically for the channel where the command is used. This prompt persists in the database.
+*   `$resetprompt`: Resets the system prompt for the current channel back to the default defined in `config.py`. Also clears the channel's conversation history. (Requires 'Manage Messages' permission).
+*   `$clearhistory`: Clears the bot's conversation history for the current channel. (Requires 'Manage Messages' permission).
+*   `$help`: Shows the built-in help message listing available commands.
 
 ## Development
 

@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - YYYY-MM-DD
+
+## [0.3.0] - 2025-04-12
+
+### Added
+- Per-channel system prompts: The bot can now have different personalities/prompts set for individual channels.
+- `$resetprompt` command: Allows users with 'Manage Messages' permission to reset a channel's custom prompt back to the default.
+- Database persistence for channel prompts: Custom prompts set via `$setprompt` are now stored in the `history.db` SQLite database and persist across restarts.
+
+### Changed
+- `$setprompt` command now sets the system prompt only for the specific channel where it is used, not globally for the bot.
+- Refactored prompt handling in `AIHandler` cog to fetch the appropriate prompt (channel-specific or default) from the database or config before calling the AI.
+- Removed global `bot.current_system_prompt` attribute.
+- Updated database schema (`database.py`) to include a `channel_prompts` table.
+
+### Fixed
+- Corrected Mistral API call structure in `AIHandler` to use `chat.complete_async`.
+- Fixed indentation errors in `AIHandler` after refactoring.
+- Updated bot status message in `on_ready` to show correct `$help` prefix.
+
 ## [0.2.0] - 2025-04-12
 
 ### Added
