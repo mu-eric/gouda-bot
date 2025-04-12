@@ -8,7 +8,6 @@ class AdminCommands(commands.Cog):
         self.bot = bot
 
     @commands.command(name='setprompt')
-    @commands.is_owner() # Restrict to bot owner
     @commands.guild_only() # Ensure it's used in a server channel
     async def set_prompt(self, ctx: commands.Context, *, new_prompt: str):
         """Sets a new system prompt for Fromage (Bot Owner only)."""

@@ -6,6 +6,7 @@ from discord.ext import commands
 from mistralai import Mistral
 import config  # Import our config module
 import database # Import our database module
+import time
 
 class AIHandler(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -101,25 +102,25 @@ class AIHandler(commands.Cog):
 
         # Call Mistral AI API
         try:
-            async with message.channel.typing():
-                chat_response = await self.mistral_client.chat(
-                    model="mistral-large-latest", # Or your preferred model
-                    messages=api_messages,
-                )
+            start_time = time.time()
+            chat_response = await self.mistral_client.chat.complete_async(
+                 model="mistral-large-latest", # Or your preferred model
+                 messages=api_messages,
+            )
 
-                if chat_response.choices:
-                    ai_response = chat_response.choices[0].message.content
-                    # Save AI response to DB
-                    database.save_message(conversation_id, "assistant", ai_response)
-                    # Send AI response to Discord
-                    # Check message length before sending
-                    if len(ai_response) > 2000:
-                        logging.warning(f"AI response too long ({len(ai_response)} chars). Truncating.")
-                        ai_response = ai_response[:1997] + "..."
-                    await message.channel.send(ai_response)
-                else:
-                    logging.warning("Mistral API returned no choices.")
-                    await message.channel.send("I pondered your words, but silence was the only reply I received.")
+            if chat_response.choices:
+                ai_response = chat_response.choices[0].message.content
+                end_time = time.time()
+                logging.info(f"Mistral API call successful. Time taken: {end_time - start_time:.2f}s")
+
+                # Save AI response
+                database.save_message(conversation_id, "assistant", ai_response)
+
+                # Send AI response to Discord
+                await message.channel.send(ai_response)
+            else:
+                logging.warning("Mistral API returned no choices.")
+                await message.channel.send("I pondered your words but couldn't quite form a response.")
 
         except Exception as e:
             logging.exception(f"Error during Mistral API call or processing: {e}")

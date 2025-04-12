@@ -66,7 +66,7 @@ async def on_ready():
     logging.info(f'discord.py version: {discord.__version__}')
     logging.info('------')
     # Set a status (optional)
-    status_message = "Contemplating deeply | $help"
+    status_message = "CheeseCraft | $help"
     await bot.change_presence(
         status=discord.Status.online,
         activity=discord.Activity(type=discord.ActivityType.playing, name=status_message)
