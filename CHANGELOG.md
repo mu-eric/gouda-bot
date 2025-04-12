@@ -5,20 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2025-04-12
 
 ### Added
-- Initial project structure with `discord.py`, `uv`, `python-dotenv`.
-- Integration with Mistral AI API (`mistralai` library v1.x).
-- Bot personality configured via system prompt (pretentious cheese connoisseur named Fromage).
-- Basic logging setup.
-- `.env` file for managing secrets (`DISCORD_TOKEN`, `MISTRAL_API_KEY`).
-- `README.md` with setup and usage instructions.
-- This `CHANGELOG.md` file.
+- Added `$setprompt` command for the bot owner to change the system prompt dynamically. This also clears the current channel's history.
+- Added `$clearhistory` command for users with "Manage Messages" permission to clear the bot's message history in the current channel.
+- Added `username` column to the message history database (`history.db`).
+- Initial project setup with basic Discord connection and Mistral AI ping.
+- SQLite database for conversation history.
+- Basic logging.
+- Username tracking in database and API calls.
 
 ### Changed
-- Updated `mistralai` client usage to align with v1.x (`Mistral` client, `chat.complete_async`).
-- Refined system prompt for Mistral AI to establish the "Fromage" persona.
+- Switched from `discord.Client` to `discord.ext.commands.Bot` to support bot commands.
+- Refined the default system prompt multiple times to achieve a more witty and engaging persona, less purely helpful or overly pretentious.
+- Message history sent to Mistral AI now includes sanitized usernames via the `name` field for user messages.
+- Updated bot status message.
+- Updated Mistral AI client usage to `mistralai` library v1.x (`Mistral` client, `chat.complete_async`).
+- **Major Refactor:** Migrated core logic into `discord.py` Cogs (`cogs/admin_commands.py`, `cogs/ai_handler.py`).
+- **Major Refactor:** Moved configuration loading and constants to `config.py`.
+- **Major Refactor:** Moved database functions to `database.py`.
+- **Major Personality Shift:** Updated default system prompt from 'cheese connoisseur' to 'thoughtful, empathetic companion' targeting INFJ/INFP interaction styles.
+
+### Fixed
+- Ensured bot checks for `send_messages` permission before attempting to send messages, preventing crashes in channels where it lacks permission.
+- Added basic error handling for commands (`$setprompt`, `$clearhistory`).
+- Ensured database initialization (`init_db`) occurs before bot attempts database operations on startup.
 
 ### Removed
+- System prompt simplification (reverted to more detailed version in config).
 - (Placeholder for future removals, e.g., previous LLM integrations if any existed before Mistral)
+
+## [0.1.0] - 2025-04-10
+
+### Added
+- Initial version of the bot.

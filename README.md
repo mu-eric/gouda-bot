@@ -1,15 +1,24 @@
 # Fromage Bot
 
-A Discord bot integrating Mistral AI's API for intelligent (and slightly pretentious) responses.
+A Discord bot powered by Python and the Mistral AI API, designed to be a thoughtful and empathetic conversational companion.
 
-## Project Overview
+This bot leverages the `discord.py` library (using the `commands.Bot` framework and Cogs) and the `mistralai` client to interact with users. It aims to provide deep, authentic dialogue, encouraging introspection and understanding.
 
-This bot, operating under the persona "Fromage," is designed to interact with users on Discord. It leverages the Mistral AI API (e.g., `mistral-large-latest`) for natural language understanding and conversation generation, embodying the personality of a sophisticated (and somewhat snobby) cheese connoisseur.
+## Features
+
+*   **AI-Powered Conversation:** Utilizes Mistral AI (`mistral-large-latest` by default) to generate nuanced and engaging responses.
+*   **Empathetic Personality:** System prompt designed to foster warmth, understanding, and genuine curiosity.
+*   **Conversation History:** Remembers the last few messages in a channel to maintain context (using SQLite).
+*   **Configurable System Prompt:** Bot owner can change the core personality prompt using the `$setprompt` command.
+*   **History Clearing:** Users with 'Manage Messages' permission (or the bot owner via `$setprompt`) can clear the bot's memory for a specific channel using `$clearhistory`.
+*   **Modular Structure:** Core logic is organized into Cogs (`cogs/ai_handler.py`, `cogs/admin_commands.py`) for better maintainability.
+*   **Configuration Module:** Settings and environment variable loading handled in `config.py`.
+*   **Database Module:** SQLite interactions managed in `database.py`.
 
 ## Tech Stack
 
 *   **Backend:** Python 3.12
-*   **Discord API:** `discord.py`
+*   **Discord API:** `discord.py` (using `discord.ext.commands.Bot` framework and Cogs)
 *   **AI Model:** Mistral AI API (via `mistralai` library)
 *   **Package Management:** `uv` with `pyproject.toml`
 *   **Environment:** VS Code Dev Container (Ubuntu)
@@ -34,7 +43,7 @@ This bot, operating under the persona "Fromage," is designed to interact with us
     ```bash
     python bot.py
     ```
-7.  **Interact:** Talk to the bot via Direct Message or by mentioning it in a channel (`@Fromage`, which might still be Gouda Bot unless changed in the Discord Developer Portal).
+7.  **Interact:** Talk to the bot via Direct Message or by mentioning it in a channel (`@Fromage`, which might still be Fromage Bot unless changed in the Discord Developer Portal).
 
 ## Development
 
